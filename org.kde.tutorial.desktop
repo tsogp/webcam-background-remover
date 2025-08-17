@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Camera Background Remover
+Name[ru]=Удаление фона с камеры
+Name[vn]=Xóa phông nền
+Exec=kirigami-hello
+Icon=kde
+Type=Application
+Terminal=false
+Categories=Utility
