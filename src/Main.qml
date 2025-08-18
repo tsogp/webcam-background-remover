@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls as Controls
+import QtQuick.Controls as QQC2
 import org.kde.kirigami as Kirigami
 import org.kde.cbr.components
 

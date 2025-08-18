@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls as Controls
+import QtQuick.Controls as QQC2
 import org.kde.kirigami as Kirigami
 
 // Heavily inspired by KDEConnect's Main page impelementation
@@ -32,7 +32,7 @@ Kirigami.OverlayDrawer {
     contentItem: ColumnLayout {
         spacing: 0
 
-        Controls.ToolBar {
+        QQC2.ToolBar {
             Layout.fillWidth: true
             Layout.preferredHeight: pageStack.globalToolBar.preferredHeight
 
@@ -46,14 +46,14 @@ Kirigami.OverlayDrawer {
                     Layout.leftMargin: Kirigami.Units.largeSpacing
                 }
 
-                Controls.ToolButton {
+                QQC2.ToolButton {
                     text: i18nc("@action:button", "Add")
                     icon.name: "list-add-symbolic"
                 }
             }
         }
 
-        Controls.ScrollView {
+        QQC2.ScrollView {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
