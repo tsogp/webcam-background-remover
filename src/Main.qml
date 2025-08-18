@@ -2,8 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
-
-import org.kde.cbr 1.0
+import org.kde.cbr.components
 
 Kirigami.ApplicationWindow {
     id: root
@@ -21,12 +20,7 @@ Kirigami.ApplicationWindow {
         }
     }
 
-    globalDrawer: Kirigami.GlobalDrawer {}
-
-    Kirigami.Page {
-        title: "Empty page"
-        id: emptyPage
-    }
+    globalDrawer: CamerasDrawer {}
 
     Kirigami.Page {
         id: contextDrawerPage
@@ -42,5 +36,5 @@ Kirigami.ApplicationWindow {
         ]
     }
 
-    pageStack.initialPage: [ emptyPage, contextDrawerPage ]
+    pageStack.initialPage: [ contextDrawerPage ]
 }

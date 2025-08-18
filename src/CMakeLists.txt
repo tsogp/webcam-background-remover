@@ -26,6 +26,9 @@ target_link_libraries(${GUI_TARGET_NAME}
     KF6::I18n
     KF6::CoreAddons
     KF6::IconThemes
+    camera-background-remover-gui-components
 )
 
 install(TARGETS ${GUI_TARGET_NAME} ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
+
+add_subdirectory(components)
