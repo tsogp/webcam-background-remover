@@ -29,6 +29,10 @@ Kirigami.OverlayDrawer {
     topPadding: 0
     bottomPadding: 0
 
+    AddVirtualCameraDialog {
+        id: virtualCameraDialog
+    }
+
     contentItem: ColumnLayout {
         spacing: 0
 
@@ -49,6 +53,7 @@ Kirigami.OverlayDrawer {
                 QQC2.ToolButton {
                     text: i18nc("@action:button", "Add")
                     icon.name: "list-add-symbolic"
+                    onClicked: virtualCameraDialog.open()
                 }
             }
         }

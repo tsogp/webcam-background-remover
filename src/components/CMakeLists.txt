@@ -9,6 +9,7 @@ ecm_add_qml_module(${GUI_TARGET_COMPONENTS_NAME}
 ecm_target_qml_sources(${GUI_TARGET_COMPONENTS_NAME}
     SOURCES
     CamerasDrawer.qml
+    AddVirtualCameraDialog.qml
 )
 
 ecm_finalize_qml_module(${GUI_TARGET_COMPONENTS_NAME})
