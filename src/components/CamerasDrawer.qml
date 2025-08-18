@@ -3,6 +3,8 @@ import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
 
+// Heavily inspired by KDEConnect's Main page impelementation
+// https://invent.kde.org/network/kdeconnect-kde/-/blob/master/app/qml/Main.qml?ref_type=heads
 Kirigami.OverlayDrawer {
     id: drawer
     edge: Qt.application.layoutDirection === Qt.RightToLeft ? Qt.RightEdge : Qt.LeftEdge
