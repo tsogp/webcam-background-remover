@@ -21,7 +21,15 @@ Kirigami.ApplicationWindow {
         }
     }
 
-    pageStack.initialPage: Kirigami.Page {
+    globalDrawer: Kirigami.GlobalDrawer {}
+
+    Kirigami.Page {
+        title: "Empty page"
+        id: emptyPage
+    }
+
+    Kirigami.Page {
+        id: contextDrawerPage
         title: i18nc("@title", "Camera Background Remover")
 
         actions: [
@@ -33,4 +41,6 @@ Kirigami.ApplicationWindow {
             }
         ]
     }
+
+    pageStack.initialPage: [ emptyPage, contextDrawerPage ]
 }
