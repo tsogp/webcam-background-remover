@@ -25,6 +25,7 @@ Kirigami.ApplicationWindow {
     Kirigami.Page {
         id: contextDrawerPage
         title: i18nc("@title", "Camera Background Remover")
+        Kirigami.Theme.colorSet: Kirigami.Theme.View
 
         actions: [
             Kirigami.Action {
@@ -34,6 +35,18 @@ Kirigami.ApplicationWindow {
                 onTriggered: pageStack.layers.push(aboutPage)
             }
         ]
+
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: Kirigami.Units.largeSpacing
+
+            // Top row: video sources
+            VideoSourcesView {}
+
+            BackgroundImageGallery {
+                Kirigami.Theme.inherit: false
+            }
+        }
     }
 
     pageStack.initialPage: [ contextDrawerPage ]

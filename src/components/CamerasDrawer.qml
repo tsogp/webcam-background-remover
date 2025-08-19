@@ -18,7 +18,7 @@ Kirigami.OverlayDrawer {
             easing.type: Easing.InOutQuad
         }
     }
-    Kirigami.Theme.colorSet: Kirigami.Theme.Window
+    Kirigami.Theme.colorSet: Kirigami.Theme.View
 
     handleClosedIcon.source: modal ? null : "sidebar-expand-left-symbolic"
     handleOpenIcon.source: modal ? null : "sidebar-collapse-left-symbolic"

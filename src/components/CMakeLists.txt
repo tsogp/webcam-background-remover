@@ -10,6 +10,9 @@ ecm_target_qml_sources(${GUI_TARGET_COMPONENTS_NAME}
     SOURCES
     CamerasDrawer.qml
     AddVirtualCameraDialog.qml
+    BackgroundImageGallery.qml
+    VideoSourcesView.qml
+    GalleryImageCard.qml
 )
 
 ecm_finalize_qml_module(${GUI_TARGET_COMPONENTS_NAME})
