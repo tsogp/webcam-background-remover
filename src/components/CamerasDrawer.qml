@@ -62,9 +62,66 @@ Kirigami.OverlayDrawer {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            Column {
-                spacing: Kirigami.Units.smallSpacing
-                // camera cards will go here
+            ListView {
+                id: cameras
+                Layout.fillWidth: true
+                clip: true
+                activeFocusOnTab: true
+                keyNavigationEnabled: true
+                model: virtualCamerasModel
+
+                section.property: "isActive"
+                section.delegate: Kirigami.ListSectionHeader {
+                    width: ListView.view.width
+                    text: section == "true" ? "Active" : "Inactive"
+                }
+
+                Kirigami.PlaceholderMessage {
+                    text: i18n("Virtual cameras will appear here")
+                    icon.name: 'documentinfo-symbolic'
+                    anchors.centerIn: parent
+                    width: parent.width - (Kirigami.Units.largeSpacing * 4)
+                    visible: cameras.count === 0
+                }
+
+                delegate: QQC2.ItemDelegate {
+                    id: delegate
+                    width: ListView.view.width
+                    highlighted: false
+
+                    property string cameraName: model.name
+                    property url sourceUrl: model.sourceUrl
+                    property url cameraUrl: model.cameraUrl
+                    property bool cameraActive: model.isActive
+
+                    contentItem: RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: delegate.leftPadding
+                        anchors.rightMargin: delegate.rightPadding
+                        anchors.topMargin: delegate.topPadding
+                        anchors.bottomMargin: delegate.bottomPadding
+                        spacing: Kirigami.Units.smallSpacing
+
+                        Kirigami.IconTitleSubtitle {
+                            Layout.fillWidth: true
+                            title: cameraName
+                            subtitle: cameraUrl.toString()
+                            icon.name: "camera-video-symbolic"
+                        }
+
+                        Rectangle {
+                            width: Kirigami.Units.iconSizes.small
+                            height: Kirigami.Units.iconSizes.small
+                            radius: width / 2
+                            color: cameraActive ? "green" : "red"
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    onClicked: {
+                        console.log("clicked ", model.name);
+                    }
+                }
             }
         }
     }

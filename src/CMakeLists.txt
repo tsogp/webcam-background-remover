@@ -9,6 +9,8 @@ ecm_add_qml_module(${GUI_TARGET_NAME}
 target_sources(${GUI_TARGET_NAME}
     PRIVATE
     main.cpp
+    virtualcameramodel.cpp
+    virtualcameramodel.h
 )
 
 ecm_target_qml_sources(${GUI_TARGET_NAME}
@@ -18,6 +20,7 @@ ecm_target_qml_sources(${GUI_TARGET_NAME}
 
 target_link_libraries(${GUI_TARGET_NAME}
     PRIVATE
+    Qt6::Core
     Qt6::Quick
     Qt6::Qml
     Qt6::Gui

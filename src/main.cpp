@@ -1,3 +1,4 @@
+#include "virtualcameramodel.h"
 #include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QtQml>
@@ -7,6 +8,7 @@
 #include <KLocalizedString>
 #include <KIconTheme>
 #include <KAboutData>
+#include <QString>
 
 int main(int argc, char *argv[])
 {
@@ -48,9 +50,38 @@ int main(int argc, char *argv[])
         }
     );
 
+    VirtualCameraModel cameraModel;
+    // TODO: remove fake cameras after testing is done
+    cameraModel.addCamera(
+        QStringLiteral("Main Camera"),
+        QUrl(QStringLiteral("file:///dev/video0")),
+        QUrl(QStringLiteral("file:///dev/video00")),
+        false
+    );
+    cameraModel.addCamera(
+        QStringLiteral("Main Camera1"), 
+        QUrl(QStringLiteral("file:///dev/video1")), 
+        QUrl(QStringLiteral("file:///dev/video11")), 
+        true
+    );
+    cameraModel.addCamera(
+        QStringLiteral("Main Camera1"), 
+        QUrl(QStringLiteral("file:///dev/video1")), 
+        QUrl(QStringLiteral("file:///dev/video11")), 
+        true
+    );
+    cameraModel.addCamera(
+        QStringLiteral("Main Camera2"), 
+        QUrl(QStringLiteral("file:///dev/video2")), 
+        QUrl(QStringLiteral("file:///dev/video22")), 
+        false
+    );
+
+
     QQmlApplicationEngine engine;
 
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
+    engine.rootContext()->setContextProperty(QStringLiteral("virtualCamerasModel"), &cameraModel);
     engine.loadFromModule("org.kde.cbr", "Main");
 
     if (engine.rootObjects().isEmpty()) {
