@@ -16,8 +16,10 @@ Kirigami.PromptDialog {
             id: createVirtualCameraButton
             text: qsTr("Create Virtual Camera")
             icon.name: "dialog-ok-symbolic"
-            enabled: cameraSourceCombo.currentIndex > 0
+            enabled: cameraSourceCombo.currentIndex > 0 && cameraNameInput.text.length !== 0
             onTriggered: {
+                // TODO: handle url creation
+                virtualCamerasModel.addCamera(cameraNameInput.text, "file:///" + cameraSourceCombo.value, "file:///dev/video", false)
                 addVirtualCameraDialog.close();
             }
         },
@@ -42,6 +44,7 @@ Kirigami.PromptDialog {
         FormCard.FormDelegateSeparator {}
 
         FormCard.FormTextFieldDelegate {
+            id: cameraNameInput
             label: i18n("Name of the virtual camera")
             enabled: cameraSourceCombo.currentIndex > 0
             placeholderText: i18n("Enter name of the virtual camera")
