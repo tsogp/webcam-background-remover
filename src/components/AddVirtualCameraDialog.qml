@@ -10,7 +10,10 @@ Kirigami.PromptDialog {
 
     preferredWidth: Kirigami.Units.gridUnit * 32
 
+    property bool nameError: false
+
     standardButtons: Kirigami.Dialog.NoButton
+
     customFooterActions: [
         Kirigami.Action {
             id: createVirtualCameraButton
@@ -19,9 +22,18 @@ Kirigami.PromptDialog {
             enabled: cameraSourceCombo.currentIndex > 0 && cameraNameInput.text.length !== 0
             onTriggered: {
                 // TODO: handle url creation
-                let cameraIdx = virtualCamerasModel.addCamera(cameraNameInput.text, "file:///" + cameraSourceCombo.value, "file:///dev/video", false);
+                let cameraIdx = virtualCamerasModel.addCamera(cameraNameInput.text, "file:///" + cameraSourceCombo.currentValue, "file:///dev/video", false);
+                if (cameraIdx === -1) {
+                    addVirtualCameraDialog.nameError = true;
+                    return;
+                }
+                addVirtualCameraDialog.nameError = false;
+
                 currentCameraModel.setCurrentIndex(virtualCamerasModel.index(cameraIdx, 0), ItemSelectionModel.ClearAndSelect);
-                console.log(currentCameraModel.currentIndex);
+
+                cameraSourceCombo.currentIndex = 0;
+                cameraNameInput.text = "";
+
                 addVirtualCameraDialog.close();
             }
         },
@@ -34,9 +46,12 @@ Kirigami.PromptDialog {
             }
         }
     ]
+
     ColumnLayout {
         FormCard.FormComboBoxDelegate {
             id: cameraSourceCombo
+            leftPadding: 0
+            rightPadding: 0
             text: i18n("Camera Source")
             description: i18n("Camera from where you want to remove background.")
             displayMode: FormCard.FormComboBoxDelegate.ComboBox
@@ -47,9 +62,22 @@ Kirigami.PromptDialog {
 
         FormCard.FormTextFieldDelegate {
             id: cameraNameInput
+            leftPadding: 0
+            rightPadding: 0
             label: i18n("Name of the virtual camera")
             enabled: cameraSourceCombo.currentIndex > 0
             placeholderText: i18n("Enter name of the virtual camera")
+
+            onTextChanged: function (text) {
+                nameError = false;
+            }
+        }
+
+        Kirigami.InlineMessage {
+            Layout.fillWidth: true
+            visible: addVirtualCameraDialog.nameError
+            type: Kirigami.MessageType.Error
+            text: i18n("Camera with name %1 already exists. Choose another one.", cameraNameInput.text)
         }
     }
 }

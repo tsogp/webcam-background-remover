@@ -1,5 +1,6 @@
 #include "virtualcameramodel.h"
 #include <QAbstractItemModel>
+#include <algorithm>
 #include <qtmetamacros.h>
 #include <qobjectdefs.h>
 
@@ -52,11 +53,20 @@ QVariantMap VirtualCameraModel::get(int row) const {
 
 int VirtualCameraModel::addCamera(const QString &name, const QUrl& source_url, const QUrl& camera_url, bool active) {
     int pos = m_cameras.count();
-    beginInsertRows(QModelIndex(), pos, pos);
-    VirtualCamera cam { name, source_url, camera_url, active };
-    m_cameras.push_back(cam);
-    endInsertRows();
-    return pos;
+
+    bool is_name_free = std::none_of(m_cameras.begin(), m_cameras.end(), [&](const VirtualCamera& a) { 
+        return a.name == name; }
+    );
+
+    if (is_name_free) {
+        beginInsertRows(QModelIndex(), pos, pos);
+        VirtualCamera cam { name, source_url, camera_url, active };
+        m_cameras.push_back(cam);
+        endInsertRows();
+        return pos;
+    } 
+
+    return -1;
 }
 
 void VirtualCameraModel::removeCamera(int index) {
