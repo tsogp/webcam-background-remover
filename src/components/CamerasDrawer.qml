@@ -70,11 +70,12 @@ Kirigami.OverlayDrawer {
                 keyNavigationEnabled: true
                 model: virtualCamerasModel
 
-                section.property: "isActive"
-                section.delegate: Kirigami.ListSectionHeader {
-                    width: ListView.view.width
-                    text: section == "true" ? "Active" : "Inactive"
-                }
+                // TODO: think of the way to have a sorted view for this to work
+                // section.property: "isActive"
+                // section.delegate: Kirigami.ListSectionHeader {
+                //     width: ListView.view.width
+                //     text: section == "true" ? "Active" : "Inactive"
+                // }
 
                 Kirigami.PlaceholderMessage {
                     text: i18n("Virtual cameras will appear here")
@@ -114,12 +115,17 @@ Kirigami.OverlayDrawer {
                             height: Kirigami.Units.iconSizes.small
                             radius: width / 2
                             color: cameraActive ? "green" : "red"
-                            anchors.verticalCenter: parent.verticalCenter
+                            Layout.alignment: Qt.AlignHCenter
                         }
                     }
 
                     onClicked: {
-                        console.log("clicked ", model.name);
+                        cameras.currentIndex = index
+                        currentCameraModel.setCurrentIndex(
+                            virtualCamerasModel.index(index, 0),
+                            ItemSelectionModel.ClearAndSelect
+                        )
+                        console.log(currentCameraModel.currentIndex);
                     }
                 }
             }

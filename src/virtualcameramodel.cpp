@@ -34,21 +34,29 @@ QVariant VirtualCameraModel::data(const QModelIndex &index, int role) const {
     }
 }
 
-void VirtualCameraModel::addCamera(const QString &name, const QUrl& source_url, const QUrl& camera_url, bool active) {
-    VirtualCamera cam { name, source_url, camera_url, active };
+QVariantMap VirtualCameraModel::get(int row) const {
+    QVariantMap m;
+    if (row < 0 || row >= m_cameras.size()) {
+        return m;
+    }
+    
+    const auto &c = m_cameras[row];
+    
+    m[QStringLiteral("name")]      = c.name;
+    m[QStringLiteral("sourceUrl")] = c.source_url;
+    m[QStringLiteral("cameraUrl")] = c.camera_url;
+    m[QStringLiteral("isActive")]  = c.is_active;
+    
+    return m;
+}
 
-    auto it = std::lower_bound(m_cameras.begin(), m_cameras.end(), cam,
-        [](const VirtualCamera &a, const VirtualCamera &b) {
-            if (a.is_active != b.is_active) 
-                return a.is_active > b.is_active;
-            return a.name.toLower() < b.name.toLower();
-        });
-
-    int pos = std::distance(m_cameras.begin(), it);
-
+int VirtualCameraModel::addCamera(const QString &name, const QUrl& source_url, const QUrl& camera_url, bool active) {
+    int pos = m_cameras.count();
     beginInsertRows(QModelIndex(), pos, pos);
-    m_cameras.insert(it, cam);
+    VirtualCamera cam { name, source_url, camera_url, active };
+    m_cameras.push_back(cam);
     endInsertRows();
+    return pos;
 }
 
 void VirtualCameraModel::removeCamera(int index) {
@@ -88,14 +96,7 @@ void VirtualCameraModel::setActive(int index, bool active) {
     if (index < 0 || index >= m_cameras.size()) {
         return;
     }
-
     m_cameras[index].is_active = active;
-
-    std::stable_sort(m_cameras.begin(), m_cameras.end(),
-                     [](const VirtualCamera &a, const VirtualCamera &b) {
-                         return a.is_active > b.is_active;
-                     });
-
-    beginResetModel();
-    endResetModel();
+    // TODO: investigate why can't import emit and have to use Q_EMIT
+    Q_EMIT dataChanged(this->index(index), this->index(index), { IsActiveRole });
 }

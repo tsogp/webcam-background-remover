@@ -19,7 +19,9 @@ Kirigami.PromptDialog {
             enabled: cameraSourceCombo.currentIndex > 0 && cameraNameInput.text.length !== 0
             onTriggered: {
                 // TODO: handle url creation
-                virtualCamerasModel.addCamera(cameraNameInput.text, "file:///" + cameraSourceCombo.value, "file:///dev/video", false)
+                let cameraIdx = virtualCamerasModel.addCamera(cameraNameInput.text, "file:///" + cameraSourceCombo.value, "file:///dev/video", false);
+                currentCameraModel.setCurrentIndex(virtualCamerasModel.index(cameraIdx, 0), ItemSelectionModel.ClearAndSelect);
+                console.log(currentCameraModel.currentIndex);
                 addVirtualCameraDialog.close();
             }
         },

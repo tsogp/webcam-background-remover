@@ -30,7 +30,8 @@ public:
     [[nodiscard]] int rowCount(const QModelIndex &) const override;
     [[nodiscard]] QHash<int, QByteArray> roleNames() const override;
     [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
-    Q_INVOKABLE void addCamera(const QString& name, const QUrl& source_url, const QUrl& camera_url, bool active = false);
+    Q_INVOKABLE [[nodiscard]] QVariantMap get(int row) const;
+    Q_INVOKABLE int addCamera(const QString& name, const QUrl& source_url, const QUrl& camera_url, bool active = false);
     Q_INVOKABLE void removeCamera(int index);
     Q_INVOKABLE void setName(int index, const QString& name);
     Q_INVOKABLE void setSourceUrl(int index, const QUrl& source_url);

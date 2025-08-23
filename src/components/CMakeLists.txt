@@ -13,6 +13,7 @@ ecm_target_qml_sources(${GUI_TARGET_COMPONENTS_NAME}
     BackgroundImageGallery.qml
     VideoSourcesView.qml
     GalleryImageCard.qml
+    CameraPage.qml
 )
 
 ecm_finalize_qml_module(${GUI_TARGET_COMPONENTS_NAME})
