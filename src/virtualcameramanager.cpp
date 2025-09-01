@@ -45,20 +45,21 @@ QStringList CameraManager::listVirtualCaptureDevices() {
 }
 
 
-virtual_camera::virtual_camera(const std::string &devicePath, int width, int height, int fps)
+virtual_camera_data::virtual_camera_data(const std::string &devicePath, const std::string &label, int width, int height, int fps)
     : dev_path(devicePath), width(width), height(height), fps(fps) {
+    create(label);
     open_device();
     configure_device();
 }
 
-virtual_camera::~virtual_camera() {
+virtual_camera_data::~virtual_camera_data() {
     if (fd >= 0) {
         close(fd);
     }
 }
 
 // Send OpenCV Mat frame (BGR24 → YUYV conversion)
-void virtual_camera::sendFrame(const cv::Mat &frame) const {
+void virtual_camera_data::sendFrame(const cv::Mat &frame) const {
     if (frame.cols != width || frame.rows != height) {
         throw std::runtime_error("Frame size mismatch");
     }
@@ -71,30 +72,33 @@ void virtual_camera::sendFrame(const cv::Mat &frame) const {
     }
 }
 
-void virtual_camera::create(const std::string &label) {
-    std::string cmd = std::format("sudo v4l2loopback-ctl add -n \"{}\" {}", label, dev_path);
+void virtual_camera_data::create(const std::string &label) {
+    std::string cmd = std::format("pkexec v4l2loopback-ctl add -n \"{}\" {}", label, dev_path);
     int ret = std::system(cmd.c_str());
     if (ret != 0) {
         throw std::runtime_error("Failed to create v4l2loopback device with modprobe");
     }
 }
 
-void virtual_camera::destroy() {
-    std::string cmd = std::format("sudo v4l2loopback-ctl remove {}", dev_path);
+void virtual_camera_data::destroy() {
+    std::string cmd = std::format("pkexec v4l2loopback-ctl remove {}", dev_path);
     int ret = std::system(cmd.c_str());
     if (ret != 0) {
         throw std::runtime_error("Failed to remove v4l2loopback device with modprobe");
     }
 }
 
-void virtual_camera::open_device() {
-    fd = open(dev_path.c_str(), O_WRONLY);
+void virtual_camera_data::open_device() {
+    fd = open(dev_path.c_str(), O_RDWR);
     if (fd < 0) {
-        throw std::runtime_error("Failed to open device: " + dev_path);
+        throw std::runtime_error(
+            "Failed to open device: " + dev_path +
+            " (errno " + std::to_string(errno) + ": " + std::strerror(errno) + ")"
+        );
     }
 }
 
-void virtual_camera::configure_device() const {
+void virtual_camera_data::configure_device() const {
     v4l2_format fmt{};
     fmt.type = V4L2_BUF_TYPE_VIDEO_OUTPUT;
     fmt.fmt.pix.width = width;

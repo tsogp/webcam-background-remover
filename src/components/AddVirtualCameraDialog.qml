@@ -22,7 +22,7 @@ Kirigami.PromptDialog {
             enabled: cameraSourceCombo.currentIndex > 0 && cameraNameInput.text.length !== 0
             onTriggered: {
                 // TODO: handle url creation
-                let cameraIdx = virtualCamerasModel.addCamera(cameraNameInput.text, "file:///" + cameraSourceCombo.currentValue, "file:///dev/video", false);
+                let cameraIdx = virtualCamerasModel.addCamera(cameraNameInput.text, cameraSourceCombo.currentValue, cameraNameInput.text, false);
                 if (cameraIdx === -1) {
                     addVirtualCameraDialog.nameError = true;
                     return;

@@ -1,6 +1,10 @@
 #include "virtualcameramodel.h"
+#include "virtualcameramanager.h"
 #include <QAbstractItemModel>
 #include <algorithm>
+#include <exception>
+#include <qdebug.h>
+#include <qlogging.h>
 #include <qtmetamacros.h>
 #include <qobjectdefs.h>
 
@@ -51,7 +55,7 @@ QVariantMap VirtualCameraModel::get(int row) const {
     return m;
 }
 
-int VirtualCameraModel::addCamera(const QString &name, const QUrl& source_url, const QUrl& camera_url, bool active) {
+int VirtualCameraModel::addCamera(const QString &name, const QString& source_url, const QString& camera_url, bool active) {
     int pos = m_cameras.count();
 
     bool is_name_free = std::none_of(m_cameras.begin(), m_cameras.end(), [&](const VirtualCamera& a) { 
@@ -60,8 +64,15 @@ int VirtualCameraModel::addCamera(const QString &name, const QUrl& source_url, c
 
     if (is_name_free) {
         beginInsertRows(QModelIndex(), pos, pos);
-        VirtualCamera cam { name, source_url, camera_url, active };
-        m_cameras.push_back(cam);
+        // TODO: fix the hard coded data and type mismatch
+        try {
+            vc::virtual_camera_data vc_data(camera_url.toStdString(), name.toStdString(), 1280, 720, 30);
+            VirtualCamera cam { name, source_url, camera_url, active, vc_data };
+            m_cameras.push_back(cam);
+        } catch (std::exception &e) {
+            qDebug() << e.what();
+        }
+
         endInsertRows();
         return pos;
     } 
@@ -84,7 +95,7 @@ void VirtualCameraModel::setName(int index, const QString& name) {
     Q_EMIT dataChanged(this->index(index), this->index(index), { NameRole });
 }
 
-void VirtualCameraModel::setSourceUrl(int index, const QUrl& source_url) {
+void VirtualCameraModel::setSourceUrl(int index, const QString& source_url) {
     if (index < 0 || index >= m_cameras.size()) {
         return;
     }
@@ -93,7 +104,7 @@ void VirtualCameraModel::setSourceUrl(int index, const QUrl& source_url) {
     Q_EMIT dataChanged(this->index(index), this->index(index), { SourceUrlRole });
 }
 
-void VirtualCameraModel::setCameraUrl(int index, const QUrl& camera_url) {
+void VirtualCameraModel::setCameraUrl(int index, const QString& camera_url) {
     if (index < 0 || index >= m_cameras.size()) {
         return;
     }

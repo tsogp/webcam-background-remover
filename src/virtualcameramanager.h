@@ -17,10 +17,10 @@ public:
     Q_INVOKABLE QStringList listVirtualCaptureDevices();
 };
 
-class virtual_camera {
+class virtual_camera_data {
 public:
-    virtual_camera(const std::string &devicePath, int width, int height, int fps);
-    ~virtual_camera();
+    virtual_camera_data(const std::string &devicePath, const std::string &label, int width, int height, int fps);
+    ~virtual_camera_data();
 
     void sendFrame(const cv::Mat &frame) const;
     void create(const std::string &label);
