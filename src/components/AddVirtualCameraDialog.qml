@@ -55,7 +55,7 @@ Kirigami.PromptDialog {
             text: i18n("Camera Source")
             description: i18n("Camera from where you want to remove background.")
             displayMode: FormCard.FormComboBoxDelegate.ComboBox
-            model: ["None", "Camera Source #1", "Camera Source #2"]
+            model: ["None"].concat(cameraManager.listPhysicalCaptureDevices())
         }
 
         FormCard.FormDelegateSeparator {}

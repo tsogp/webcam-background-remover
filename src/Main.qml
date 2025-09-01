@@ -12,28 +12,30 @@ Kirigami.ApplicationWindow {
 
     title: i18nc("@title:window", "Camera Background Remover")
 
-    property var currentCam: currentCameraModel.currentIndex.valid
-        ? virtualCamerasModel.get(currentCameraModel.currentIndex.row)
-        : null
+    property var currentCam: currentCameraModel.currentIndex.valid ? virtualCamerasModel.get(currentCameraModel.currentIndex.row) : null
 
     function updateCurrectCam() {
         if (currentCameraModel.currentIndex.valid) {
-            currentCam = virtualCamerasModel.get(currentCameraModel.currentIndex.row)
+            currentCam = virtualCamerasModel.get(currentCameraModel.currentIndex.row);
         } else {
-            currentCam = null
+            currentCam = null;
         }
     }
 
     Connections {
         target: virtualCamerasModel
 
-        onDataChanged: updateCurrectCam()
+        onDataChanged: function () {
+            updateCurrectCam();
+        }
     }
 
     Connections {
         target: currentCameraModel
 
-        onCurrentChanged: updateCurrectCam()
+        onCurrentChanged: function () {
+            updateCurrectCam();
+        }
     }
 
     Component {
@@ -49,33 +51,25 @@ Kirigami.ApplicationWindow {
     Kirigami.Page {
         id: contextDrawerPage
 
-        title: currentCameraModel.currentIndex.valid
-            ? currentCam.name
-            : i18nc("@title", "Camera Background Remover")
+        title: currentCameraModel.currentIndex.valid ? currentCam.name : i18nc("@title", "Camera Background Remover")
 
         Kirigami.Theme.colorSet: Kirigami.Theme.View
 
         actions: [
             Kirigami.Action {
                 visible: currentCameraModel.currentIndex.valid
-                icon.name: currentCam && currentCam.isActive
-                    ? "media-playback-stop-symbolic"
-                    : "media-playback-start-symbolic"
-                text: currentCam && currentCam.isActive 
-                    ? i18nc("@action:button", "Turn Off")
-                    : i18nc("@action:button", "Turn On")
+                icon.name: currentCam && currentCam.isActive ? "media-playback-stop-symbolic" : "media-playback-start-symbolic"
+                text: currentCam && currentCam.isActive ? i18nc("@action:button", "Turn Off") : i18nc("@action:button", "Turn On")
                 onTriggered: virtualCamerasModel.setActive(currentCameraModel.currentIndex.row, !currentCam.isActive)
             },
-
             Kirigami.Action {
                 visible: currentCameraModel.currentIndex.valid
                 icon.name: "edit-delete-symbolic"
                 text: i18nc("@action:button", "Delete Camera")
                 onTriggered: {
-                    virtualCamerasModel.removeCamera(currentCameraModel.currentIndex.row)
+                    virtualCamerasModel.removeCamera(currentCameraModel.currentIndex.row);
                 }
             },
-
             Kirigami.Action {
                 id: showAboutPageAction
                 icon.name: "documentinfo-symbolic"
@@ -97,18 +91,18 @@ Kirigami.ApplicationWindow {
                 verticalAlignment: Text.AlignVCenter
                 wrapMode: Text.Wrap
             }
-            
+
             // Top row: video sources
             VideoSourcesView {
-                visible: currentCameraModel.currentIndex.valid 
+                visible: currentCameraModel.currentIndex.valid
             }
 
-            BackgroundImageGallery {
-                visible: currentCameraModel.currentIndex.valid
-                Kirigami.Theme.inherit: false
-            }
+            // BackgroundImageGallery {
+            //     visible: currentCameraModel.currentIndex.valid
+            //     Kirigami.Theme.inherit: false
+            // }
         }
     }
 
-    pageStack.initialPage: [ contextDrawerPage ]
+    pageStack.initialPage: [contextDrawerPage]
 }

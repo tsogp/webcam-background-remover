@@ -11,12 +11,16 @@ target_sources(${GUI_TARGET_NAME}
     main.cpp
     virtualcameramodel.cpp
     virtualcameramodel.h
+    virtualcameramanager.cpp
+    virtualcameramanager.h
 )
 
 ecm_target_qml_sources(${GUI_TARGET_NAME}
     SOURCES
     Main.qml
 )
+
+find_package(OpenCV REQUIRED)
 
 target_link_libraries(${GUI_TARGET_NAME}
     PRIVATE
@@ -30,6 +34,7 @@ target_link_libraries(${GUI_TARGET_NAME}
     KF6::CoreAddons
     KF6::IconThemes
     camera-background-remover-gui-components
+    ${OpenCV_LIBS}
 )
 
 install(TARGETS ${GUI_TARGET_NAME} ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})

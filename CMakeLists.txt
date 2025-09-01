@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.20)
 set(PROJECT_NAME camera-background-remover)
+set(CMAKE_CXX_STANDARD 23)
 project(${PROJECT_NAME})
+
+add_definitions(-fexceptions)
 
 find_package(ECM 6.0.0 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
