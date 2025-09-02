@@ -7,6 +7,9 @@
 #include <qlogging.h>
 #include <qtmetamacros.h>
 #include <qobjectdefs.h>
+#include <stdexcept>
+
+namespace fs = std::filesystem;
 
 VirtualCameraModel::VirtualCameraModel(QObject *parent) : QAbstractListModel(parent) {
 }
@@ -62,22 +65,39 @@ int VirtualCameraModel::addCamera(const QString &name, const QString& source_url
         return a.name == name; }
     );
 
-    if (is_name_free) {
-        beginInsertRows(QModelIndex(), pos, pos);
-        // TODO: fix the hard coded data and type mismatch
-        try {
-            vc::virtual_camera_data vc_data(camera_url.toStdString(), name.toStdString(), 1280, 720, 30);
-            VirtualCamera cam { name, source_url, camera_url, active, vc_data };
-            m_cameras.push_back(cam);
-        } catch (std::exception &e) {
-            qDebug() << e.what();
-        }
+    if (!is_name_free) {
+        return -1;
+    }
 
+    try {
+        vc::virtual_camera_data vc_data(camera_url.toStdString(), name.toStdString(), 640, 480, 30);
+        vc_data.create();
+        VirtualCamera cam { name, source_url, camera_url, active, vc_data };
+
+        beginInsertRows(QModelIndex(), pos, pos);
+        m_cameras.push_back(cam);
         endInsertRows();
+
         return pos;
     } 
+    catch (const std::logic_error &e) {
+        // Device already exists → just log it, but still add camera
+        qDebug() << "Filesystem error (non-fatal):" << e.what();
 
-    return -1;
+        vc::virtual_camera_data vc_data(camera_url.toStdString(), name.toStdString(), 640, 480, 30);
+        VirtualCamera cam { name, source_url, camera_url, active, vc_data };
+
+        beginInsertRows(QModelIndex(), pos, pos);
+        m_cameras.push_back(cam);
+        endInsertRows();
+
+        return pos;
+    } 
+    catch (const std::exception &e) {
+        // All other errors are fatal
+        qDebug() << "Error creating camera:" << e.what();
+        return -1;
+    }
 }
 
 void VirtualCameraModel::removeCamera(int index) {

@@ -1,4 +1,8 @@
 #include "virtualcameramanager.h"
+#include <filesystem>
+#include <system_error>
+
+namespace fs = std::filesystem;
 
 namespace vc {
 QStringList CameraManager::listPhysicalCaptureDevices() {
@@ -46,8 +50,7 @@ QStringList CameraManager::listVirtualCaptureDevices() {
 
 
 virtual_camera_data::virtual_camera_data(const std::string &devicePath, const std::string &label, int width, int height, int fps)
-    : dev_path(devicePath), width(width), height(height), fps(fps) {
-    create(label);
+    : dev_path(devicePath), label(label), width(width), height(height), fps(fps) {
     open_device();
     configure_device();
 }
@@ -72,9 +75,14 @@ void virtual_camera_data::sendFrame(const cv::Mat &frame) const {
     }
 }
 
-void virtual_camera_data::create(const std::string &label) {
+void virtual_camera_data::create() {
+    if (fs::exists(dev_path)) {
+        throw std::logic_error("Device path already exists: " + dev_path);
+    }
+
     std::string cmd = std::format("pkexec v4l2loopback-ctl add -n \"{}\" {}", label, dev_path);
     int ret = std::system(cmd.c_str());
+
     if (ret != 0) {
         throw std::runtime_error("Failed to create v4l2loopback device with modprobe");
     }

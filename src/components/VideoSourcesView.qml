@@ -8,7 +8,6 @@ ColumnLayout {
     Connections {
         target: videoFrameProvider
         function onFrameReady(before, after) {
-            console.log("new frame ready")
             beforeImg.source = before;
             afterImg.source = after;
         }

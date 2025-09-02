@@ -23,11 +23,12 @@ public:
     ~virtual_camera_data();
 
     void sendFrame(const cv::Mat &frame) const;
-    void create(const std::string &label);
+    void create();
     void destroy();
 
 private:
     std::string dev_path;
+    std::string label;
     int fd{-1};
     int width;
     int height;
