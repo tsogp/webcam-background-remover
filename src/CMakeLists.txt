@@ -13,6 +13,9 @@ target_sources(${GUI_TARGET_NAME}
     virtualcameramodel.h
     virtualcameramanager.cpp
     virtualcameramanager.h
+    videoframeprovider.cpp
+    videoframeprovider.h
+    frameprocessor.h
 )
 
 ecm_target_qml_sources(${GUI_TARGET_NAME}

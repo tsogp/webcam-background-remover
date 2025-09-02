@@ -1,3 +1,5 @@
+#include "frameprocessor.h"
+#include "videoframeprovider.h"
 #include "virtualcameramanager.h"
 #include "virtualcameramodel.h"
 #include <KAboutData>
@@ -8,6 +10,7 @@
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
 #include <QString>
+#include <QStringLiteral>
 #include <QUrl>
 #include <QtQml>
 
@@ -53,6 +56,11 @@ int main(int argc, char *argv[]) {
 
     QQmlApplicationEngine engine;
 
+    auto *imgProvider = new ImageProvider();
+    engine.addImageProvider(QStringLiteral("frames"), imgProvider);
+
+    VideoFrameProvider videoFrameProvider("/home/tsogp/prog/cpp/camera-backgorund-remover/build/bin/SINet_Softmax.onnx", "/home/tsogp/prog/cpp/camera-backgorund-remover/build/bin/whitehouse.jpeg", imgProvider);
+    engine.rootContext()->setContextProperty(QStringLiteral("videoFrameProvider"), &videoFrameProvider);
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
     engine.rootContext()->setContextProperty(QStringLiteral("virtualCamerasModel"), &cameraModel);
     engine.rootContext()->setContextProperty(QStringLiteral("currentCameraModel"), &selectionModel);

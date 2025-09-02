@@ -21,6 +21,7 @@ ColumnLayout {
     }
 
     Loader {
+        id: cameraLoader
         Layout.fillWidth: true
         Layout.fillHeight: true
         active: chosenCameraIdx !== -1

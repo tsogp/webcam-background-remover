@@ -5,38 +5,35 @@ import org.kde.kirigami as Kirigami
 import org.kde.kirigamiaddons.formcard as FormCard
 
 ColumnLayout {
+    Connections {
+        target: videoFrameProvider
+        function onFrameReady(before, after) {
+            console.log("new frame ready")
+            beforeImg.source = before;
+            afterImg.source = after;
+        }
+    }
+
     RowLayout {
         Layout.fillWidth: true
         Layout.preferredHeight: 300
         spacing: Kirigami.Units.largeSpacing
 
-        Rectangle {
+        Image {
+            id: beforeImg
             Layout.fillWidth: true
             Layout.preferredHeight: 300
-            color: "#444"
-            radius: 8
-            border.color: "#888"
-            Text {
-                anchors.centerIn: parent
-                text: "Video Source 1"
-                color: "white"
-            }
+            fillMode: Image.PreserveAspectFit
         }
 
-        Rectangle {
+        Image {
+            id: afterImg
             Layout.fillWidth: true
             Layout.preferredHeight: 300
-            color: "#444"
-            radius: 8
-            border.color: "#888"
-            Text {
-                anchors.centerIn: parent
-                text: "Video Source 2"
-                color: "white"
-            }
+            fillMode: Image.PreserveAspectFit
         }
     }
-    
+
     FormCard.FormComboBoxDelegate {
         id: cameraSourceCombo
         text: i18n("Camera Source")
@@ -51,5 +48,11 @@ ColumnLayout {
         description: i18n("Select background type for replacement.")
         displayMode: FormCard.FormComboBoxDelegate.ComboBox
         model: ["Color", "Image", "Video"]
+    }
+
+    QQC2.Button {
+        text: i18nc("@action:button", "Start")
+        icon.name: "list-add"
+        onClicked: videoFrameProvider.start()
     }
 }
