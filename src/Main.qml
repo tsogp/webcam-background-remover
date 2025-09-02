@@ -95,6 +95,7 @@ Kirigami.ApplicationWindow {
             // Top row: video sources
             VideoSourcesView {
                 visible: currentCameraModel.currentIndex.valid
+                isActive: currentCameraModel.currentIndex.valid
             }
 
             // BackgroundImageGallery {

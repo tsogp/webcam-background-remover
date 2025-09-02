@@ -26,8 +26,25 @@ VideoFrameProvider::VideoFrameProvider(const std::string &model,
 }
 
 void VideoFrameProvider::start() {
-    timer->start(30); // 30 ms ≈ 33 FPS
+    if (!timer->isActive()) {
+        timer->start(30); // 30 ms ≈ 33 FPS
+    }
+
+    if (!cap.isOpened()) {
+        cap.open(0);
+    }
 }
+
+void VideoFrameProvider::stop() {
+    if (timer->isActive()) {
+        timer->stop();
+    }
+
+    if (cap.isOpened()) {
+        cap.release();
+    }
+}
+
 
 void VideoFrameProvider::setBackgroundImage(const QString &path) {
     QString localPath = path;

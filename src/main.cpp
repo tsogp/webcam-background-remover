@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
     auto *imgProvider = new ImageProvider();
     engine.addImageProvider(QStringLiteral("frames"), imgProvider);
 
-    VideoFrameProvider videoFrameProvider("/home/tsogp/prog/cpp/camera-backgorund-remover/build/bin/SINet_Softmax.onnx", "/home/tsogp/prog/cpp/camera-backgorund-remover/build/bin/whitehouse.jpeg", imgProvider);
+    VideoFrameProvider videoFrameProvider("/home/tsogp/prog/cpp/camera-backgorund-remover/build/bin/SINet_Softmax.onnx", "/home/tsogp/prog/cpp/camera-backgorund-remover/build/bin/background.jpg", imgProvider);
     engine.rootContext()->setContextProperty(QStringLiteral("videoFrameProvider"), &videoFrameProvider);
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
     engine.rootContext()->setContextProperty(QStringLiteral("virtualCamerasModel"), &cameraModel);

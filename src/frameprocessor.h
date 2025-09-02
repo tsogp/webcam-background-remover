@@ -1,7 +1,6 @@
 #ifndef __FRAME_PROCESSOR_H__
 #define __FRAME_PROCESSOR_H__
 
-// ImageProvider.h
 #include <QStringLiteral>
 #include <QImage>
 #include <QMutex>
