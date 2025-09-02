@@ -16,6 +16,7 @@ public:
     VideoFrameProvider(const std::string &model, const std::string &backgroundPath, ImageProvider *provider, QObject *parent = nullptr);
 
     Q_INVOKABLE void start();
+    Q_INVOKABLE void setBackgroundImage(const QString &path);
 Q_SIGNALS:
     void frameReady(const QString &beforeKey, const QString &afterKey);
 

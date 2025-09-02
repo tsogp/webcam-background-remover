@@ -29,6 +29,23 @@ void VideoFrameProvider::start() {
     timer->start(30); // 30 ms ≈ 33 FPS
 }
 
+void VideoFrameProvider::setBackgroundImage(const QString &path) {
+    QString localPath = path;
+
+    if (path.startsWith(QStringLiteral("file://"))) {
+        QUrl url(path);
+        localPath = url.toLocalFile();
+    }
+
+    background = cv::imread(localPath.toStdString(), cv::IMREAD_COLOR);
+    if (background.empty()) {
+        qWarning() << "Failed to load background image:" << path;
+        return;
+    }
+    cv::resize(background, background, cv::Size(320, 320));
+    background.convertTo(background, CV_32FC3);
+}
+
 void VideoFrameProvider::processFrame() {
     cv::Mat frame;
     cap >> frame;
@@ -115,6 +132,9 @@ void VideoFrameProvider::processFrame() {
     cv::bitwise_not(mask, invMask);
     background.copyTo(bg, invMask);
     cv::add(fg, bg, result);
+
+    // Resize it back
+    cv::resize(result, result, before.size());
 
     QImage qBefore(before.data, before.cols, before.rows, before.step, QImage::Format_BGR888);
     QImage qAfter(result.data, result.cols, result.rows, result.step, QImage::Format_BGR888);

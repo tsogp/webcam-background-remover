@@ -2,9 +2,12 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 import org.kde.kirigami as Kirigami
+import QtQuick.Dialogs
 import org.kde.kirigamiaddons.formcard as FormCard
 
 ColumnLayout {
+    property string backgroundFileName: ""
+
     Connections {
         target: videoFrameProvider
         function onFrameReady(before, after) {
@@ -33,20 +36,26 @@ ColumnLayout {
         }
     }
 
-    FormCard.FormComboBoxDelegate {
-        id: cameraSourceCombo
-        text: i18n("Camera Source")
-        description: i18n("Camera from where you want to remove background.")
-        displayMode: FormCard.FormComboBoxDelegate.ComboBox
-        model: ["None", "Camera Source #1", "Camera Source #2"]
+    QQC2.Button {
+        text: i18n("Choose Background Image")
+        icon.name: "folder-image"
+        onClicked: backgroundFileDialog.open()
     }
 
-    FormCard.FormComboBoxDelegate {
-        id: backgroundTypeCombo
-        text: i18n("Background Type")
-        description: i18n("Select background type for replacement.")
-        displayMode: FormCard.FormComboBoxDelegate.ComboBox
-        model: ["Color", "Image", "Video"]
+    QQC2.Label {
+        text: backgroundFileName === "" ? i18n("No background selected") : i18n("Selected: %1", backgroundFileName)
+        wrapMode: Text.Wrap
+        Layout.fillWidth: true
+    }
+
+    FileDialog {
+        id: backgroundFileDialog
+        title: i18n("Select Background Image")
+        nameFilters: ["Images (*.png *.jpg *.jpeg *.bmp)"]
+        onAccepted: {
+            videoFrameProvider.setBackgroundImage(backgroundFileDialog.selectedFile)
+            backgroundFileName = backgroundFileDialog.selectedFile.toString().split("/").pop() // just filename
+        }
     }
 
     QQC2.Button {
