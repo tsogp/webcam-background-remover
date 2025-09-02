@@ -37,4 +37,10 @@ add_subdirectory(src)
 
 install(PROGRAMS org.kde.cbr.desktop DESTINATION ${KDE_INSTALL_APPDIR})
 
+file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR}/bin)
+file(COPY ${CMAKE_SOURCE_DIR}/models DESTINATION ${CMAKE_BINARY_DIR}/bin)
+
+install(FILES assets/background.jpg DESTINATION ${KDE_INSTALL_APPDIR}/bin/assets)
+install(FILES models/SINet_Softmax.onnx DESTINATION ${KDE_INSTALL_APPDIR}/bin/models)
+
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)

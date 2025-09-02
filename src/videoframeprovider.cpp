@@ -89,21 +89,19 @@ void VideoFrameProvider::processFrame() {
     cv::threshold(bgval, mask, 0.3, 255, cv::THRESH_BINARY_INV);
     mask.convertTo(mask, CV_8U);
 
-    bool enableThreshold   = true;
-    double contourFilter   = 0.005; // relative size threshold (0.0 - 1.0)
-    double smoothContour   = 0.3;   // 0.0 - 1.0
-    double feather         = 0.2;   // 0.0 - 1.0
+    bool enableThreshold = true;
+    double contourFilter = 0.005; // relative size threshold (0.0 - 1.0)
+    double smoothContour = 0.3;   // 0.0 - 1.0
+    double feather = 0.2;         // 0.0 - 1.0
 
     if (enableThreshold) {
         // Filter small contours
         if (contourFilter > 0.0 && contourFilter < 1.0) {
             std::vector<std::vector<cv::Point>> contours;
-            cv::findContours(mask, contours,
-                             cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+            cv::findContours(mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
             std::vector<std::vector<cv::Point>> filteredContours;
-            double contourSizeThreshold =
-                (double)mask.total() * contourFilter;
+            double contourSizeThreshold = (double)mask.total() * contourFilter;
 
             for (auto &contour : contours) {
                 if (cv::contourArea(contour) > contourSizeThreshold) {
@@ -112,27 +110,25 @@ void VideoFrameProvider::processFrame() {
             }
 
             mask.setTo(0);
-            cv::drawContours(mask, filteredContours, -1,
-                             cv::Scalar(255), -1);
+            cv::drawContours(mask, filteredContours, -1, cv::Scalar(255), -1);
         }
 
         // Smooth contour edges
         if (smoothContour > 0.0) {
             int k_size = (int)(3 + 11 * smoothContour);
-            if (k_size % 2 == 0) k_size++;
-            cv::stackBlur(mask, mask,
-                          cv::Size(k_size, k_size));
+            if (k_size % 2 == 0)
+                k_size++;
+            cv::stackBlur(mask, mask, cv::Size(k_size, k_size));
             mask = mask > 128;
         }
 
         // Feathering (blur edges for soft transition)
         if (feather > 0.0) {
             int k_size = (int)(5 * feather);
-            if (k_size % 2 == 0) k_size++;
-            cv::dilate(mask, mask, cv::Mat(),
-                       cv::Point(-1, -1), k_size / 3);
-            cv::boxFilter(mask, mask, -1,
-                          cv::Size(k_size, k_size));
+            if (k_size % 2 == 0)
+                k_size++;
+            cv::dilate(mask, mask, cv::Mat(), cv::Point(-1, -1), k_size / 3);
+            cv::boxFilter(mask, mask, -1, cv::Size(k_size, k_size));
         }
     }
 
@@ -164,7 +160,7 @@ void VideoFrameProvider::processFrame() {
 
     // The frame counter is to view trigger refresh on the view
     QString beforeUrl = QString(QStringLiteral("image://frames/before?%1")).arg(frameCounter);
-    QString afterUrl  = QString(QStringLiteral("image://frames/after?%1")).arg(frameCounter);
+    QString afterUrl = QString(QStringLiteral("image://frames/after?%1")).arg(frameCounter);
 
     Q_EMIT frameReady(beforeUrl, afterUrl);
 }
