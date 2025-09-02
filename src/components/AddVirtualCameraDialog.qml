@@ -21,18 +21,31 @@ Kirigami.PromptDialog {
             icon.name: "dialog-ok-symbolic"
             enabled: cameraSourceCombo.currentIndex > 0 && cameraNameInput.text.length !== 0
             onTriggered: {
-                // TODO: handle url creation
-                let cameraIdx = virtualCamerasModel.addCamera(cameraNameInput.text, cameraSourceCombo.currentValue, cameraNameInput.text, false);
+                // Construct the device path
+                let devPath = "/dev/video" + cameraNumberChooser.value;
+
+                // Call into model
+                let cameraIdx = virtualCamerasModel.addCamera(
+                    cameraNameInput.text,
+                    cameraSourceCombo.currentValue,
+                    devPath,
+                    false
+                );
+
                 if (cameraIdx === -1) {
                     addVirtualCameraDialog.nameError = true;
                     return;
                 }
                 addVirtualCameraDialog.nameError = false;
 
-                currentCameraModel.setCurrentIndex(virtualCamerasModel.index(cameraIdx, 0), ItemSelectionModel.ClearAndSelect);
+                currentCameraModel.setCurrentIndex(
+                    virtualCamerasModel.index(cameraIdx, 0),
+                    ItemSelectionModel.ClearAndSelect
+                );
 
                 cameraSourceCombo.currentIndex = 0;
                 cameraNameInput.text = "";
+                cameraNumberChooser.value = 10; // reset to default
 
                 addVirtualCameraDialog.close();
             }
@@ -41,9 +54,7 @@ Kirigami.PromptDialog {
             id: cancelVirtualCameraCreationButton
             text: qsTr("Cancel")
             icon.name: "dialog-cancel-symbolic"
-            onTriggered: {
-                addVirtualCameraDialog.close();
-            }
+            onTriggered: addVirtualCameraDialog.close()
         }
     ]
 
@@ -52,6 +63,7 @@ Kirigami.PromptDialog {
             id: cameraSourceCombo
             leftPadding: 0
             rightPadding: 0
+            currentIndex: 0
             text: i18n("Camera Source")
             description: i18n("Camera from where you want to remove background.")
             displayMode: FormCard.FormComboBoxDelegate.ComboBox
@@ -71,6 +83,19 @@ Kirigami.PromptDialog {
             onTextChanged: function (text) {
                 nameError = false;
             }
+        }
+
+        FormCard.FormDelegateSeparator {}
+
+        FormCard.FormSpinBoxDelegate {
+            enabled: cameraSourceCombo.currentIndex > 0
+            id: cameraNumberChooser
+            leftPadding: 0
+            rightPadding: 0
+            label: i18n("Device number (will be used to construct the path like /dev/videoX)")
+            from: 1
+            to: 64
+            value: 10
         }
 
         Kirigami.InlineMessage {
