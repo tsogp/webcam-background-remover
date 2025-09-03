@@ -50,9 +50,7 @@ int main(int argc, char *argv[]) {
                                  return engine->toScriptValue(KAboutData::applicationData());
                              });
 
-    VirtualCameraModel cameraModel;
-    QItemSelectionModel selectionModel(&cameraModel);
-    vc::CameraManager cameraManager;
+
 
     QQmlApplicationEngine engine;
 
@@ -63,6 +61,9 @@ int main(int argc, char *argv[]) {
     QString modelPath = QCoreApplication::applicationDirPath() + QStringLiteral("/models/SINet_Softmax.onnx");
 
     VideoFrameProvider videoFrameProvider(modelPath.toStdString(), absPath.toStdString(), imgProvider);
+    VirtualCameraModel cameraModel(&videoFrameProvider);
+    QItemSelectionModel selectionModel(&cameraModel);
+    vc::CameraManager cameraManager;
     engine.rootContext()->setContextProperty(QStringLiteral("videoFrameProvider"), &videoFrameProvider);
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
     engine.rootContext()->setContextProperty(QStringLiteral("virtualCamerasModel"), &cameraModel);

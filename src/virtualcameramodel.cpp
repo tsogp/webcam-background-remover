@@ -5,13 +5,14 @@
 #include <exception>
 #include <qdebug.h>
 #include <qlogging.h>
-#include <qtmetamacros.h>
 #include <qobjectdefs.h>
+#include <qtmetamacros.h>
 #include <stdexcept>
 
 namespace fs = std::filesystem;
 
-VirtualCameraModel::VirtualCameraModel(QObject *parent) : QAbstractListModel(parent) {
+VirtualCameraModel::VirtualCameraModel(VideoFrameProvider *provider, QObject *parent)
+    : QAbstractListModel(parent), m_videoFrameProvider(provider) {
 }
 
 int VirtualCameraModel::rowCount(const QModelIndex &) const {
@@ -47,23 +48,25 @@ QVariantMap VirtualCameraModel::get(int row) const {
     if (row < 0 || row >= m_cameras.size()) {
         return m;
     }
-    
+
     const auto &c = m_cameras[row];
-    
-    m[QStringLiteral("name")]      = c.name;
+
+    m[QStringLiteral("name")] = c.name;
     m[QStringLiteral("sourceUrl")] = c.source_url;
     m[QStringLiteral("cameraUrl")] = c.camera_url;
-    m[QStringLiteral("isActive")]  = c.is_active;
-    
+    m[QStringLiteral("isActive")] = c.is_active;
+
     return m;
 }
 
-int VirtualCameraModel::addCamera(const QString &name, const QString& source_url, const QString& camera_url, bool active) {
+int VirtualCameraModel::addCamera(const QString &name,
+                                  const QString &source_url,
+                                  const QString &camera_url,
+                                  bool active) {
     int pos = m_cameras.count();
 
-    bool is_name_free = std::none_of(m_cameras.begin(), m_cameras.end(), [&](const VirtualCamera& a) { 
-        return a.name == name; }
-    );
+    bool is_name_free =
+        std::none_of(m_cameras.begin(), m_cameras.end(), [&](const VirtualCamera &a) { return a.name == name; });
 
     if (!is_name_free) {
         return -1;
@@ -72,28 +75,26 @@ int VirtualCameraModel::addCamera(const QString &name, const QString& source_url
     try {
         vc::virtual_camera_data vc_data(camera_url.toStdString(), name.toStdString(), 640, 480, 30);
         vc_data.create();
-        VirtualCamera cam { name, source_url, camera_url, active, vc_data };
+        VirtualCamera cam{name, source_url, camera_url, active, vc_data};
 
         beginInsertRows(QModelIndex(), pos, pos);
         m_cameras.push_back(cam);
         endInsertRows();
 
         return pos;
-    } 
-    catch (const std::logic_error &e) {
+    } catch (const std::logic_error &e) {
         // Device already exists → just log it, but still add camera
         qDebug() << "Filesystem error (non-fatal):" << e.what();
 
         vc::virtual_camera_data vc_data(camera_url.toStdString(), name.toStdString(), 640, 480, 30);
-        VirtualCamera cam { name, source_url, camera_url, active, vc_data };
+        VirtualCamera cam{name, source_url, camera_url, active, vc_data};
 
         beginInsertRows(QModelIndex(), pos, pos);
         m_cameras.push_back(cam);
         endInsertRows();
 
         return pos;
-    } 
-    catch (const std::exception &e) {
+    } catch (const std::exception &e) {
         // All other errors are fatal
         qDebug() << "Error creating camera:" << e.what();
         return -1;
@@ -102,35 +103,36 @@ int VirtualCameraModel::addCamera(const QString &name, const QString& source_url
 
 void VirtualCameraModel::removeCamera(int index) {
     beginRemoveRows(QModelIndex(), index, index);
+    m_cameras[index].data.destroy();
     m_cameras.removeAt(index);
     endRemoveRows();
 }
 
-void VirtualCameraModel::setName(int index, const QString& name) {
+void VirtualCameraModel::setName(int index, const QString &name) {
     if (index < 0 || index >= m_cameras.size()) {
         return;
     }
     m_cameras[index].name = name;
     // TODO: investigate why can't import emit and have to use Q_EMIT
-    Q_EMIT dataChanged(this->index(index), this->index(index), { NameRole });
+    Q_EMIT dataChanged(this->index(index), this->index(index), {NameRole});
 }
 
-void VirtualCameraModel::setSourceUrl(int index, const QString& source_url) {
+void VirtualCameraModel::setSourceUrl(int index, const QString &source_url) {
     if (index < 0 || index >= m_cameras.size()) {
         return;
     }
     m_cameras[index].source_url = source_url;
     // TODO: investigate why can't import emit and have to use Q_EMIT
-    Q_EMIT dataChanged(this->index(index), this->index(index), { SourceUrlRole });
+    Q_EMIT dataChanged(this->index(index), this->index(index), {SourceUrlRole});
 }
 
-void VirtualCameraModel::setCameraUrl(int index, const QString& camera_url) {
+void VirtualCameraModel::setCameraUrl(int index, const QString &camera_url) {
     if (index < 0 || index >= m_cameras.size()) {
         return;
     }
     m_cameras[index].camera_url = camera_url;
     // TODO: investigate why can't import emit and have to use Q_EMIT
-    Q_EMIT dataChanged(this->index(index), this->index(index), { CameraUrlRole });
+    Q_EMIT dataChanged(this->index(index), this->index(index), {CameraUrlRole});
 }
 
 void VirtualCameraModel::setActive(int index, bool active) {
@@ -138,6 +140,11 @@ void VirtualCameraModel::setActive(int index, bool active) {
         return;
     }
     m_cameras[index].is_active = active;
+    if (active) {
+        m_videoFrameProvider->setOutputDevice(m_cameras[index].data);
+    } else {
+        m_videoFrameProvider->clearOutputDevice();
+    }
     // TODO: investigate why can't import emit and have to use Q_EMIT
-    Q_EMIT dataChanged(this->index(index), this->index(index), { IsActiveRole });
+    Q_EMIT dataChanged(this->index(index), this->index(index), {IsActiveRole});
 }

@@ -60,7 +60,9 @@ Kirigami.ApplicationWindow {
                 visible: currentCameraModel.currentIndex.valid
                 icon.name: currentCam && currentCam.isActive ? "media-playback-stop-symbolic" : "media-playback-start-symbolic"
                 text: currentCam && currentCam.isActive ? i18nc("@action:button", "Turn Off") : i18nc("@action:button", "Turn On")
-                onTriggered: virtualCamerasModel.setActive(currentCameraModel.currentIndex.row, !currentCam.isActive)
+                onTriggered: {
+                    virtualCamerasModel.setActive(currentCameraModel.currentIndex.row, !currentCam.isActive)
+                }
             },
             Kirigami.Action {
                 visible: currentCameraModel.currentIndex.valid

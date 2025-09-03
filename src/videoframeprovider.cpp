@@ -1,4 +1,6 @@
 #include "videoframeprovider.h"
+#include <optional>
+#include <qlogging.h>
 #include <qstringliteral.h>
 
 VideoFrameProvider::VideoFrameProvider(const std::string &model,
@@ -6,7 +8,8 @@ VideoFrameProvider::VideoFrameProvider(const std::string &model,
                                        ImageProvider *provider,
                                        QObject *parent)
     : QObject(parent), cap(0), imgProvider(provider) {
-    // Load ONNX model
+    
+    // Load ONNX 
     net = cv::dnn::readNetFromONNX(model);
     net.setPreferableBackend(0);
     net.setPreferableTarget(1);
@@ -63,9 +66,17 @@ void VideoFrameProvider::setBackgroundImage(const QString &path) {
     background.convertTo(background, CV_32FC3);
 }
 
+void VideoFrameProvider::setOutputDevice(const vc::virtual_camera_data &virtualCam) {
+    virtualCamData = virtualCam;
+}
+
+void VideoFrameProvider::clearOutputDevice() {
+    virtualCamData = std::nullopt;
+}
+
 void VideoFrameProvider::processFrame() {
     cv::Mat frame;
-    cap >> frame;
+    cap.read(frame);
     if (frame.empty()) {
         return;
     }
@@ -148,6 +159,11 @@ void VideoFrameProvider::processFrame() {
 
     // Resize it back
     cv::resize(result, result, before.size());
+
+    if (virtualCamData.has_value()) {
+        qDebug() << "wrote frame to " << virtualCamData->dev_path;
+        virtualCamData->sendFrame(result);
+    }
 
     QImage qBefore(before.data, before.cols, before.rows, before.step, QImage::Format_BGR888);
     QImage qAfter(result.data, result.cols, result.rows, result.step, QImage::Format_BGR888);

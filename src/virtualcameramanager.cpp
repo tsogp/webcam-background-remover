@@ -1,6 +1,8 @@
 #include "virtualcameramanager.h"
 #include <filesystem>
-#include <system_error>
+#include <opencv2/highgui.hpp>
+#include <qdebug.h>
+#include <string>
 
 namespace fs = std::filesystem;
 
@@ -49,8 +51,13 @@ QStringList CameraManager::listVirtualCaptureDevices() {
 }
 
 
-virtual_camera_data::virtual_camera_data(const std::string &devicePath, const std::string &label, int width, int height, int fps)
+virtual_camera_data::virtual_camera_data(const std::string &devicePath,
+                                         const std::string &label,
+                                         int width,
+                                         int height,
+                                         int fps)
     : dev_path(devicePath), label(label), width(width), height(height), fps(fps) {
+    create();
     open_device();
     configure_device();
 }
@@ -61,8 +68,21 @@ virtual_camera_data::~virtual_camera_data() {
     }
 }
 
-// Send OpenCV Mat frame (BGR24 → YUYV conversion)
-void virtual_camera_data::sendFrame(const cv::Mat &frame) const {
+std::string fd_to_path(int fd) {
+    std::ostringstream link;
+    link << "/proc/" << getpid() << "/fd/" << fd;
+
+    char buf[PATH_MAX];
+    ssize_t len = readlink(link.str().c_str(), buf, sizeof(buf) - 1);
+    if (len == -1) {
+        throw std::runtime_error("Failed to resolve fd path");
+    }
+    buf[len] = '\0';
+    return std::string(buf);
+}
+
+// TODO: fix this horror (virtual camera is not created)
+void virtual_camera_data::sendFrame(const cv::Mat& frame) const {
     if (frame.cols != width || frame.rows != height) {
         throw std::runtime_error("Frame size mismatch");
     }
@@ -76,20 +96,33 @@ void virtual_camera_data::sendFrame(const cv::Mat &frame) const {
 }
 
 void virtual_camera_data::create() {
-    if (fs::exists(dev_path)) {
-        throw std::logic_error("Device path already exists: " + dev_path);
+    // Check if device exists
+    if (access(dev_path.c_str(), F_OK) == 0) {
+        std::cout << dev_path << " already exists, skipping creation.\n";
+        return;
     }
 
-    std::string cmd = std::format("pkexec v4l2loopback-ctl add -n \"{}\" {}", label, dev_path);
-    int ret = std::system(cmd.c_str());
+    std::string cmd = "pkexec modprobe -r v4l2loopback";
+    std::system(cmd.c_str());
 
+    // get the number from /dev/video10
+    int dev_num = std::stoi(dev_path.substr(10));
+
+    cmd =
+        "pkexec modprobe v4l2loopback devices=1 video_nr=" + std::to_string(dev_num) + " card_label=\"" + label + "\"";
+    int ret = std::system(cmd.c_str());
     if (ret != 0) {
         throw std::runtime_error("Failed to create v4l2loopback device with modprobe");
+    }
+
+    usleep(200000);
+    if (access(dev_path.c_str(), F_OK) != 0) {
+        throw std::runtime_error("Device still not found after modprobe: " + dev_path);
     }
 }
 
 void virtual_camera_data::destroy() {
-    std::string cmd = std::format("pkexec v4l2loopback-ctl remove {}", dev_path);
+    std::string cmd = std::format("pkexec v4l2loopback-ctl delete {}", dev_path);
     int ret = std::system(cmd.c_str());
     if (ret != 0) {
         throw std::runtime_error("Failed to remove v4l2loopback device with modprobe");
@@ -97,12 +130,12 @@ void virtual_camera_data::destroy() {
 }
 
 void virtual_camera_data::open_device() {
-    fd = open(dev_path.c_str(), O_RDWR);
+    qDebug() << dev_path;
+    fd = open(dev_path.c_str(), O_WRONLY);
+    qDebug() << "FD " << fd << " points to " << fd_to_path(fd);
     if (fd < 0) {
-        throw std::runtime_error(
-            "Failed to open device: " + dev_path +
-            " (errno " + std::to_string(errno) + ": " + std::strerror(errno) + ")"
-        );
+        throw std::runtime_error("Failed to open device: " + dev_path + " (errno " + std::to_string(errno) + ": " +
+                                 std::strerror(errno) + ")");
     }
 }
 
