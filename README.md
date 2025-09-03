@@ -1,6 +1,6 @@
 # Real-Time Video Background Remover
 
-![demo](https://github.com/tsogp/webcam-background-remover/blob/main/assets/video.webm)
+![demo](https://github.com/tsogp/webcam-background-remover/blob/main/assets/video.gif)
 
 A **real-time video background removal application** built with **Qt6** and **OpenCV**. This app captures video from your webcam, applies a deep learning-based background segmentation model (ONNX), and replaces the background with a custom image or video in real time. **In future** the processed video can be streamed to virtual camera devices using **v4l2loopback**.
 
