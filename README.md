@@ -49,7 +49,7 @@ sudo cmake --install build --config Release
 ```
 
 ```bash
-./camera-background-remover
+./camera-background-remover-gui
 ```
 
 ## Usage
