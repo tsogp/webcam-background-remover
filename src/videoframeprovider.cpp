@@ -7,7 +7,7 @@ VideoFrameProvider::VideoFrameProvider(const std::string &model,
                                        const std::string &backgroundPath,
                                        ImageProvider *provider,
                                        QObject *parent)
-    : QObject(parent), cap(0), imgProvider(provider) {
+    : QObject(parent), imgProvider(provider) {
     
     // Load ONNX 
     net = cv::dnn::readNetFromONNX(model);
@@ -34,7 +34,7 @@ void VideoFrameProvider::start() {
     }
 
     if (!cap.isOpened()) {
-        cap.open(0);
+        cap.open(currentPath.toStdString());
     }
 }
 
@@ -48,6 +48,15 @@ void VideoFrameProvider::stop() {
     }
 }
 
+void VideoFrameProvider::setOutputDevice(const QString &path) {
+    currentPath = path;
+
+    if (!cap.open(currentPath.toStdString())) {
+        qWarning() << "Failed to open video capture:" << path;
+    } else {
+        qDebug() << "Opened video capture:" << path;
+    }
+}
 
 void VideoFrameProvider::setBackgroundImage(const QString &path) {
     QString localPath = path;

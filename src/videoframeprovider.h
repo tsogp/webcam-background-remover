@@ -25,6 +25,7 @@ public:
     Q_INVOKABLE void start();
     Q_INVOKABLE void stop();
     Q_INVOKABLE void setBackgroundImage(const QString &path);
+    Q_INVOKABLE void setOutputDevice(const QString &path);
     Q_INVOKABLE void setOutputDevice(const vc::virtual_camera_data &virtualCam);
     Q_INVOKABLE void clearOutputDevice();
 Q_SIGNALS:
@@ -34,6 +35,7 @@ private Q_SLOTS:
     void processFrame();
 
 private:
+    QString currentPath;
     QTimer *timer;
     cv::VideoCapture cap;
     cv::dnn::Net net;

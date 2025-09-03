@@ -17,6 +17,7 @@ Kirigami.ApplicationWindow {
     function updateCurrectCam() {
         if (currentCameraModel.currentIndex.valid) {
             currentCam = virtualCamerasModel.get(currentCameraModel.currentIndex.row);
+            videoFrameProvider.setOutputDevice(currentCam.sourceUrl);
         } else {
             currentCam = null;
         }

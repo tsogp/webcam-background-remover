@@ -20,7 +20,7 @@ QStringList CameraManager::listPhysicalCaptureDevices() {
         v4l2_capability caps{};
         if (ioctl(fd, VIDIOC_QUERYCAP, &caps) == 0) {
             bool is_capture = caps.capabilities & V4L2_CAP_VIDEO_CAPTURE;
-            if (is_capture && strcmp(reinterpret_cast<char *>(caps.driver), "v4l2 loopback") != 0) {
+            if (is_capture) {
                 result << QString::fromStdString(dev);
             }
         }
