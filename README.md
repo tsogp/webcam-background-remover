@@ -19,7 +19,7 @@ A **real-time video background removal application** built with **Qt6** and **Op
 To build and run this project, you need:
 
 - **Qt6** (Base, Declarative, Kirigami)
-- **CMake** and **Extra CMake Modules**
+- **CMake**
 - **OpenCV** (with DNN module)
 - **v4l2loopback** (Linux kernel module to create virtual cameras)
 - KDE Frameworks modules: `ki18n`, `kcoreaddons`, `breeze`, `kiconthemes`
