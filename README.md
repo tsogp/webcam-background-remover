@@ -38,7 +38,7 @@ Clone the repository:
 
 ```bash
 git clone https://github.com/tsogp/webcam-background-remover
-cd camera-background-remover
+cd webcam-background-remover
 ```
 
 Bulid with CMake:
